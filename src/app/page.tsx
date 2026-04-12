@@ -242,17 +242,6 @@ export default function Home() {
               </motion.div>
             )}
 
-            {/* Radar Map Modal */}
-            <AnimatePresence>
-              {showRadar && displayCurrent && (
-                <RadarMap
-                  lat={displayCurrent.lat}
-                  lon={displayCurrent.lon}
-                  onClose={() => setShowRadar(false)}
-                />
-              )}
-            </AnimatePresence>
-
             {!selectedCoords && !showLoading && (
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
@@ -267,10 +256,21 @@ export default function Home() {
           </AnimatePresence>
         </main>
 
-        <footer className="py-4 text-center text-white/40 text-sm">
+        <footer className="w-full py-4 text-center text-sm text-white/50">
           SkyCast 2025 - Données fournies par OpenWeatherMap
         </footer>
       </div>
+
+      {/* Radar Map Modal - En dehors du flux principal */}
+      <AnimatePresence>
+        {showRadar && displayCurrent && (
+          <RadarMap
+            lat={displayCurrent.lat}
+            lon={displayCurrent.lon}
+            onClose={() => setShowRadar(false)}
+          />
+        )}
+      </AnimatePresence>
     </DynamicBackground>
   );
 }
