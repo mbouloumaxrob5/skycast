@@ -3,7 +3,8 @@ import { NextRequest, NextResponse } from 'next/server';
 export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url);
   const endpoint = searchParams.get('endpoint');
-  const apiKey = process.env.OPENWEATHER_API_KEY;
+  // Utiliser NEXT_PUBLIC_ pour le dev, OPENWEATHER_API_KEY pour la prod
+  const apiKey = process.env.OPENWEATHER_API_KEY || process.env.NEXT_PUBLIC_OPENWEATHER_API_KEY;
   
   if (!apiKey) {
     return NextResponse.json(
