@@ -4,6 +4,7 @@ import { useEffect, useRef, useState, useCallback } from 'react';
 import { motion } from 'framer-motion';
 import { X, Play, Pause, CloudRain, Wind } from 'lucide-react';
 import { cn } from '@/lib/utils/cn';
+import { analytics } from '@/lib/analytics/analyticsService';
 
 interface RadarMapProps {
   lat: number;
@@ -35,6 +36,24 @@ export function RadarMap({ lat, lon, onClose }: RadarMapProps) {
   const [isPlaying, setIsPlaying] = useState(false);
   const [mapType, setMapType] = useState<'radar' | 'satellite'>('radar');
   const animationRef = useRef<NodeJS.Timeout | null>(null);
+  const openTimeRef = useRef<number>(Date.now());
+
+  // Track radar open
+  useEffect(() => {
+    analytics.usage.radar.open();
+    openTimeRef.current = Date.now();
+    
+    return () => {
+      const duration = Date.now() - openTimeRef.current;
+      analytics.track('radar_close', { 
+        duration,
+        lat, 
+        lon,
+        mapType,
+        framesViewed: currentFrame 
+      });
+    };
+  }, [lat, lon, mapType, currentFrame]);
 
   // Fetch RainViewer data
   useEffect(() => {

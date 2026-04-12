@@ -1,5 +1,6 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
+import { analytics } from '@/lib/analytics/analyticsService';
 
 type ThemeMode = 'dark' | 'light' | 'system';
 
@@ -30,6 +31,10 @@ export const useThemeStore = create<ThemeState>()(
         set({ mode, isDark });
         document.documentElement.classList.toggle('dark', isDark);
         document.documentElement.classList.toggle('light', !isDark);
+        analytics.track('settings_change', { 
+          setting: 'theme', 
+          value: mode 
+        });
       },
       
       toggleTheme: () => {
@@ -38,6 +43,9 @@ export const useThemeStore = create<ThemeState>()(
         set({ mode: newMode, isDark: newIsDark });
         document.documentElement.classList.toggle('dark', newIsDark);
         document.documentElement.classList.toggle('light', !newIsDark);
+        analytics.track('theme_toggle', { 
+          mode: newMode 
+        });
       },
     }),
     {

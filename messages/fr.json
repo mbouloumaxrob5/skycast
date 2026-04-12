@@ -1,0 +1,113 @@
+{
+  "metadata": {
+    "title": "SkyCast - Météo en temps réel",
+    "description": "Application météo moderne avec prévisions détaillées et radar"
+  },
+  "header": {
+    "searchPlaceholder": "Rechercher une ville... (ex: Paris, Tokyo)",
+    "myLocation": "Ma position",
+    "searching": "Recherche en cours...",
+    "noResults": "Aucune ville trouvée pour \"{query}\"",
+    "searchError": "Erreur de recherche. Vérifiez votre connexion."
+  },
+  "weather": {
+    "currentWeather": "Météo actuelle",
+    "feelsLike": "Ressenti",
+    "humidity": "Humidité",
+    "wind": "Vent",
+    "pressure": "Pression",
+    "visibility": "Visibilité",
+    "uvIndex": "Indice UV",
+    "sunrise": "Lever du soleil",
+    "sunset": "Coucher du soleil",
+    "forecast": "Prévisions",
+    "hourly": "Prévisions horaires",
+    "daily": "Prévisions 5 jours",
+    "radar": "Radar météo",
+    "openRadar": "Voir le radar",
+    "closeRadar": "Fermer le radar",
+    "min": "Min",
+    "max": "Max",
+    "today": "Aujourd'hui",
+    "tomorrow": "Demain"
+  },
+  "favorites": {
+    "title": "Favoris",
+    "add": "Ajouter aux favoris",
+    "remove": "Retirer des favoris",
+    "empty": "Aucun favori",
+    "addHint": "Recherchez une ville pour l'ajouter"
+  },
+  "offline": {
+    "title": "Mode hors ligne",
+    "message": "Données en cache affichées",
+    "refresh": "Rafraîchir"
+  },
+  "errors": {
+    "geolocationNotSupported": "La géolocalisation n'est pas supportée",
+    "geolocationDenied": "Permission de géolocalisation refusée",
+    "geolocationUnavailable": "Position non disponible",
+    "geolocationTimeout": "Délai de géolocalisation dépassé",
+    "weatherFetchError": "Erreur lors de la récupération des données météo",
+    "tryAgain": "Réessayer"
+  },
+  "alerts": {
+    "title": "Alertes météo",
+    "noAlerts": "Aucune alerte active",
+    "severity": {
+      "minor": "Mineur",
+      "moderate": "Modéré",
+      "severe": "Sévère",
+      "extreme": "Extrême"
+    }
+  },
+  "notifications": {
+    "enable": "Activer les notifications",
+    "disable": "Désactiver les notifications",
+    "test": "Tester",
+    "notSupported": "Les notifications ne sont pas supportées",
+    "permissionDenied": "Permission refusée"
+  },
+  "theme": {
+    "light": "Clair",
+    "dark": "Sombre",
+    "toggle": "Changer de thème"
+  },
+  "analytics": {
+    "title": "Analytics & Monitoring",
+    "backToHome": "Retour à l'accueil",
+    "totalEvents": "Événements totaux",
+    "errorRate": "Taux d'erreur",
+    "avgResponseTime": "Temps de réponse moyen",
+    "eventDistribution": "Distribution des événements",
+    "errorSummary": "Résumé des erreurs",
+    "performanceMetrics": "Métriques de performance",
+    "usageStats": "Statistiques d'utilisation",
+    "favoritesCount": "Favoris",
+    "radarOpens": "Ouvertures radar",
+    "alertsCount": "Alertes",
+    "offlineEvents": "Événements hors ligne",
+    "timeRange": {
+      "label": "Plage temporelle",
+      "today": "Aujourd'hui",
+      "week": "7 derniers jours",
+      "all": "Tout l'historique"
+    },
+    "export": "Exporter les données",
+    "reset": "Réinitialiser les données",
+    "noData": "Aucune donnée analytics disponible"
+  },
+  "common": {
+    "loading": "Chargement...",
+    "cancel": "Annuler",
+    "close": "Fermer",
+    "save": "Sauvegarder",
+    "delete": "Supprimer",
+    "yes": "Oui",
+    "no": "Non"
+  },
+  "footer": {
+    "copyright": "SkyCast 2025 - Données fournies par OpenWeatherMap",
+    "analytics": "Analytics"
+  }
+}

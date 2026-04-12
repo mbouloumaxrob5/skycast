@@ -2,6 +2,7 @@
 
 import { useState, useCallback, useRef } from 'react';
 import { Coordinates } from '@/types/weather';
+import { analytics } from '@/lib/analytics/analyticsService';
 
 interface GeolocationState {
   coords: Coordinates | null;
@@ -22,7 +23,9 @@ export function useGeolocation() {
   
   const getLocation = useCallback(async (): Promise<void> => {
     if (!state.isSupported) {
-      setState(prev => ({ ...prev, error: 'La géolocalisation n\'est pas supportée' }));
+      const message = 'La géolocalisation n\'est pas supportée';
+      setState(prev => ({ ...prev, error: message }));
+      analytics.error.geolocation(message);
       return;
     }
     
@@ -30,9 +33,12 @@ export function useGeolocation() {
     isRequestingRef.current = true;
     
     setState(prev => ({ ...prev, isLoading: true, error: null }));
+    analytics.track('geolocation_request');
+    const startTime = performance.now();
     
     navigator.geolocation.getCurrentPosition(
       (position) => {
+        const duration = performance.now() - startTime;
         setState({
           coords: {
             lat: position.coords.latitude,
@@ -42,9 +48,17 @@ export function useGeolocation() {
           error: null,
           isSupported: true,
         });
+        analytics.performance.end('geolocation', 'geolocation');
+        analytics.track('geolocation_success', {
+          lat: position.coords.latitude,
+          lon: position.coords.longitude,
+          accuracy: position.coords.accuracy,
+          duration,
+        });
         isRequestingRef.current = false;
       },
       (error) => {
+        const duration = performance.now() - startTime;
         let errorMessage = 'Erreur de géolocalisation';
         switch (error.code) {
           case error.PERMISSION_DENIED:
@@ -62,6 +76,12 @@ export function useGeolocation() {
           isLoading: false,
           error: errorMessage,
         }));
+        analytics.error.geolocation(errorMessage);
+        analytics.track('geolocation_error', {
+          error: errorMessage,
+          code: error.code,
+          duration,
+        });
         isRequestingRef.current = false;
       },
       { enableHighAccuracy: true, timeout: 10000, maximumAge: 600000 }

@@ -64,6 +64,13 @@ export function usePushNotifications() {
       return;
     }
 
+    // Vérifier la clé VAPID
+    const vapidKey = process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY;
+    if (!vapidKey || vapidKey.trim() === '') {
+      setError('Clé VAPID manquante. Ajoutez NEXT_PUBLIC_VAPID_PUBLIC_KEY dans .env.local');
+      return;
+    }
+
     setIsLoading(true);
     setError(null);
 
@@ -81,12 +88,21 @@ export function usePushNotifications() {
       // Récupérer l'enregistrement du service worker
       const registration = await navigator.serviceWorker.ready;
 
+      // Convertir la clé VAPID
+      const applicationServerKey = urlBase64ToUint8Array(vapidKey);
+      
+      // Vérifier que la clé convertie est valide
+      const keyArray = applicationServerKey as Uint8Array;
+      if (keyArray.length === 0) {
+        setError('Clé VAPID invalide. Générez une nouvelle clé avec: npx web-push generate-vapid-keys');
+        setIsLoading(false);
+        return;
+      }
+
       // S'abonner au push manager
       const pushSubscription = await registration.pushManager.subscribe({
         userVisibleOnly: true,
-        applicationServerKey: urlBase64ToUint8Array(
-          process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY || ''
-        ),
+        applicationServerKey,
       });
 
       setSubscription(pushSubscription);
@@ -163,22 +179,27 @@ export function usePushNotifications() {
 
 // Helper: Convertir la clé VAPID
 function urlBase64ToUint8Array(base64String: string): BufferSource {
-  if (!base64String) {
+  if (!base64String || base64String.trim() === '') {
     return new Uint8Array(0) as BufferSource;
   }
 
-  const padding = '='.repeat((4 - base64String.length % 4) % 4);
-  const base64 = (base64String + padding)
-    .replace(/\-/g, '+')
-    .replace(/_/g, '/');
+  try {
+    const padding = '='.repeat((4 - base64String.length % 4) % 4);
+    const base64 = (base64String + padding)
+      .replace(/\-/g, '+')
+      .replace(/_/g, '/');
 
-  const rawData = window.atob(base64);
-  const outputArray = new Uint8Array(rawData.length);
+    const rawData = window.atob(base64);
+    const outputArray = new Uint8Array(rawData.length);
 
-  for (let i = 0; i < rawData.length; ++i) {
-    outputArray[i] = rawData.charCodeAt(i);
+    for (let i = 0; i < rawData.length; ++i) {
+      outputArray[i] = rawData.charCodeAt(i);
+    }
+    return outputArray as BufferSource;
+  } catch {
+    // Retourner un array vide si la conversion échoue (clé invalide)
+    return new Uint8Array(0) as BufferSource;
   }
-  return outputArray as BufferSource;
 }
 
 // Sauvegarder la subscription sur le serveur

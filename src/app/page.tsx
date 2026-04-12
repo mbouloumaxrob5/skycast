@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState, useCallback } from 'react';
+import { useEffect, useState, useCallback, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Header } from '@/components/layout/Header';
 import { DynamicBackground } from '@/components/layout/DynamicBackground';
@@ -23,10 +23,13 @@ import { OfflineIndicator } from '@/components/ui/OfflineIndicator';
 import { WeatherAlerts } from '@/components/ui/WeatherAlerts';
 import { AlertBadge } from '@/components/layout/AlertBadge';
 import { City, FavoriteCity, CurrentWeather, ForecastData } from '@/types/weather';
+import { BarChart3 } from 'lucide-react';
+import Link from 'next/link';
 
 export default function Home() {
   const [selectedCoords, setSelectedCoords] = useState<{ lat: number; lon: number } | null>(null);
   const [showRadar, setShowRadar] = useState(false);
+  const isGeolocatingRef = useRef(false);
   
   // Initialiser le thème au chargement
   const { isDark } = useThemeStore();
@@ -70,16 +73,23 @@ export default function Home() {
   const [cachedData, setCachedData] = useState<{ current: CurrentWeather; forecast: ForecastData } | null>(null);
   const [hasCachedData, setHasCachedData] = useState(false);
 
-  // Géolocalisation au chargement
+  // Géolocalisation au chargement ou quand on clique sur le bouton
   useEffect(() => {
-    const shouldSetCoords = coords && !selectedCoords && !selectedCity;
-    if (shouldSetCoords) {
-      // Utiliser requestAnimationFrame pour éviter les renders en cascade
+    if (!coords) return;
+    
+    // Cas 1: Initial load (pas de ville sélectionnée)
+    const isInitialLoad = !selectedCoords && !selectedCity;
+    // Cas 2: Utilisateur a cliqué sur "Ma position"
+    const isExplicitGeolocation = isGeolocatingRef.current;
+    
+    if (isInitialLoad || isExplicitGeolocation) {
       requestAnimationFrame(() => {
         setSelectedCoords(coords);
+        setSelectedCity(null); // Reset la ville sélectionnée pour afficher la position actuelle
       });
+      isGeolocatingRef.current = false; // Reset le flag
     }
-  }, [coords, selectedCoords, selectedCity]);
+  }, [coords, selectedCoords, selectedCity, setSelectedCity]);
 
   // Sauvegarder les données en cache quand on reçoit de nouvelles données
   useEffect(() => {
@@ -120,6 +130,7 @@ export default function Home() {
 
   const handleGeolocate = useCallback(() => {
     clearError();
+    isGeolocatingRef.current = true; // Marquer qu'on vient de cliquer sur le bouton
     getLocation();
   }, [clearError, getLocation]);
 
@@ -256,8 +267,15 @@ export default function Home() {
           </AnimatePresence>
         </main>
 
-        <footer className="w-full py-4 text-center text-sm text-white/50">
-          SkyCast 2025 - Données fournies par OpenWeatherMap
+        <footer className="w-full py-4 flex items-center justify-center gap-4 text-sm text-white/50">
+          <span>SkyCast 2025 - Données fournies par OpenWeatherMap</span>
+          <Link 
+            href="/analytics" 
+            className="flex items-center gap-1 hover:text-white transition-colors"
+          >
+            <BarChart3 className="w-4 h-4" />
+            Analytics
+          </Link>
         </footer>
       </div>
 

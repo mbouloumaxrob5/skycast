@@ -1,6 +1,7 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { FavoriteCity, City } from '@/types/weather';
+import { analytics } from '@/lib/analytics/analyticsService';
 
 interface WeatherState {
   selectedCity: City | null;
@@ -26,7 +27,17 @@ export const useWeatherStore = create<WeatherState>()(
       favorites: [],
       lastSearched: null,
       
-      setSelectedCity: (city) => set({ selectedCity: city }),
+      setSelectedCity: (city) => {
+        if (city) {
+          analytics.track('city_select', { 
+            name: city.name, 
+            country: city.country,
+            lat: city.lat,
+            lon: city.lon 
+          });
+        }
+        set({ selectedCity: city });
+      },
       
       addToFavorites: (city) => {
         const id = generateCityId(city);
@@ -37,12 +48,21 @@ export const useWeatherStore = create<WeatherState>()(
           favorites.pop();
         }
         
+        analytics.usage.favorite.add();
+        analytics.track('favorite_add', { 
+          name: city.name, 
+          country: city.country 
+        });
+        
         set({
           favorites: [{ ...city, id }, ...favorites],
         });
       },
       
       removeFromFavorites: (cityId) => {
+        analytics.usage.favorite.remove();
+        analytics.track('favorite_remove', { cityId });
+        
         set({
           favorites: get().favorites.filter(f => f.id !== cityId),
         });
@@ -54,7 +74,10 @@ export const useWeatherStore = create<WeatherState>()(
         );
       },
       
-      setLastSearched: (city) => set({ lastSearched: city }),
+      setLastSearched: (city) => {
+        analytics.usage.search(city.name);
+        set({ lastSearched: city });
+      },
       clearLastSearched: () => set({ lastSearched: null }),
     }),
     {

@@ -1,6 +1,7 @@
 'use client';
 
-import { useSyncExternalStore } from 'react';
+import { useSyncExternalStore, useEffect, useRef } from 'react';
+import { analytics } from '@/lib/analytics/analyticsService';
 
 function subscribe(callback: () => void) {
   window.addEventListener('online', callback);
@@ -21,6 +22,18 @@ function getServerSnapshot(): boolean {
 
 export function useOffline() {
   const isOffline = useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot);
+  const lastStateRef = useRef(isOffline);
+
+  useEffect(() => {
+    if (isOffline !== lastStateRef.current) {
+      if (isOffline) {
+        analytics.usage.offline();
+      } else {
+        analytics.usage.online();
+      }
+      lastStateRef.current = isOffline;
+    }
+  }, [isOffline]);
 
   return {
     isOffline,

@@ -7,7 +7,9 @@ import { cn } from '@/lib/utils/cn';
 import { useDebounce } from '@/hooks/useDebounce';
 import { ThemeToggle } from '@/components/ui/ThemeToggle';
 import { PushNotificationToggle } from '@/components/ui/PushNotificationToggle';
+import { LanguageSwitcher } from '@/components/ui/LanguageSwitcher';
 import { City } from '@/types/weather';
+import { useTranslations } from 'next-intl';
 import { searchCities } from '@/lib/api/geocodingService';
 
 interface HeaderProps {
@@ -19,6 +21,7 @@ interface HeaderProps {
 }
 
 export function Header({ onCitySelect, onGeolocate, isGeolocating, selectedCity, alertBadge }: HeaderProps) {
+  const t = useTranslations('header');
   const [searchQuery, setSearchQuery] = useState('');
   const [suggestions, setSuggestions] = useState<City[]>([]);
   const [isSearching, setIsSearching] = useState(false);
@@ -48,11 +51,11 @@ export function Header({ onCitySelect, onGeolocate, isGeolocating, selectedCity,
       setHighlightedIndex(-1);
     } catch {
       setSuggestions([]);
-      setSearchError('Erreur de recherche. Vérifiez votre connexion.');
+      setSearchError(t('searchError'));
     } finally {
       setIsSearching(false);
     }
-  }, [debouncedQuery, apiKey]);
+  }, [debouncedQuery, apiKey, t]);
   
   useEffect(() => {
     fetchSuggestions();
@@ -154,8 +157,8 @@ export function Header({ onCitySelect, onGeolocate, isGeolocating, selectedCity,
                 }}
                 onFocus={() => setShowSuggestions(true)}
                 onKeyDown={handleKeyDown}
-                placeholder="Rechercher une ville... (ex: Paris, Tokyo)"
-                aria-label="Rechercher une ville"
+                placeholder={t('searchPlaceholder')}
+                aria-label={t('searchPlaceholder')}
                 className={cn(
                   "w-full pl-10 pr-10 py-2.5 rounded-xl",
                   "bg-white/10 dark:bg-white/10 light:bg-white/80",
@@ -188,7 +191,7 @@ export function Header({ onCitySelect, onGeolocate, isGeolocating, selectedCity,
                   {isSearching && (
                     <div className="px-4 py-3 text-white/50 dark:text-white/50 light:text-gray-500 text-sm flex items-center gap-2">
                       <Loader2 size={16} className="animate-spin" />
-                      Recherche en cours...
+                      {t('searching')}
                     </div>
                   )}
                   
@@ -200,7 +203,7 @@ export function Header({ onCitySelect, onGeolocate, isGeolocating, selectedCity,
                   
                   {!isSearching && !searchError && suggestions.length === 0 && debouncedQuery.length >= 2 && (
                     <div className="px-4 py-3 text-white/50 dark:text-white/50 light:text-gray-500 text-sm">
-                      Aucune ville trouvée pour &ldquo;{debouncedQuery}&rdquo;
+                      {t('noResults', { query: debouncedQuery })}
                     </div>
                   )}
                   
@@ -244,7 +247,7 @@ export function Header({ onCitySelect, onGeolocate, isGeolocating, selectedCity,
               "disabled:opacity-50 disabled:cursor-not-allowed",
               "transition-colors"
             )}
-            title="Ma position"
+            title={t('myLocation')}
           >
             <motion.div
               animate={isGeolocating ? { rotate: 360 } : { rotate: 0 }}
@@ -254,6 +257,7 @@ export function Header({ onCitySelect, onGeolocate, isGeolocating, selectedCity,
             </motion.div>
           </motion.button>
           
+          <LanguageSwitcher />
           <PushNotificationToggle />
           <ThemeToggle />
         </div>
