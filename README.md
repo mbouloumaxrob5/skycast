@@ -114,4 +114,4 @@ vercel
 
 ## 📄 Licence
 
-MIT © [Votre Nom]
+MIT © [MBOULOU Maxwell Yoan Roberto]
