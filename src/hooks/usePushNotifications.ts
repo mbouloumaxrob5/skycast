@@ -2,9 +2,6 @@
 
 import { useState, useEffect, useCallback } from 'react';
 
-// URL du service worker
-const SW_PATH = '/sw.js';
-
 export interface PushSubscriptionData {
   endpoint: string;
   keys: {
@@ -146,7 +143,7 @@ export function usePushNotifications() {
         tag: 'test',
         requireInteraction: true,
       });
-    } catch (err) {
+    } catch {
       setError('Impossible d\'envoyer la notification de test');
     }
   }, [isSubscribed, subscription]);
