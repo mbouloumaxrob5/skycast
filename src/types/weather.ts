@@ -14,6 +14,8 @@ export interface City {
 export interface CurrentWeather {
   city: string;
   country: string;
+  lat: number;
+  lon: number;
   temperature: number;
   feelsLike: number;
   humidity: number;

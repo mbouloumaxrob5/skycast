@@ -34,6 +34,10 @@ interface OpenWeatherCurrent {
     sunrise: number;
     sunset: number;
   };
+  coord: {
+    lat: number;
+    lon: number;
+  };
   main: {
     temp: number;
     feels_like: number;
@@ -75,6 +79,8 @@ export function transformCurrentWeather(raw: OpenWeatherCurrent): CurrentWeather
   return {
     city: raw.name,
     country: raw.sys.country,
+    lat: raw.coord.lat,
+    lon: raw.coord.lon,
     temperature: Math.round(raw.main.temp),
     feelsLike: Math.round(raw.main.feels_like),
     humidity: raw.main.humidity,

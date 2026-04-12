@@ -9,6 +9,7 @@ import { DetailGrid } from '@/components/weather/DetailGrid';
 import { ForecastList } from '@/components/weather/ForecastList';
 import { HourlyForecast } from '@/components/weather/HourlyForecast';
 import { FavoritesList } from '@/components/weather/FavoritesList';
+import { RadarMap } from '@/components/weather/RadarMap';
 import { WeatherPageSkeleton } from '@/components/ui/Skeleton';
 import { ErrorMessage } from '@/components/ui/ErrorMessage';
 import { useWeather } from '@/hooks/useWeather';
@@ -25,6 +26,7 @@ import { City, FavoriteCity, CurrentWeather, ForecastData } from '@/types/weathe
 
 export default function Home() {
   const [selectedCoords, setSelectedCoords] = useState<{ lat: number; lon: number } | null>(null);
+  const [showRadar, setShowRadar] = useState(false);
   
   // Initialiser le thème au chargement
   const { isDark } = useThemeStore();
@@ -202,6 +204,19 @@ export default function Home() {
               >
                 <HeroCard weather={displayCurrent} />
                 
+                {/* Bouton Radar */}
+                <motion.button
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
+                  onClick={() => setShowRadar(true)}
+                  className="w-full py-3 rounded-xl bg-gradient-to-r from-blue-500/20 to-cyan-500/20 border border-blue-500/30 text-white hover:from-blue-500/30 hover:to-cyan-500/30 transition-all flex items-center justify-center gap-2"
+                >
+                  <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7" />
+                  </svg>
+                  Voir le radar des précipitations
+                </motion.button>
+                
                 <DetailGrid weather={displayCurrent} />
                 
                 {displayForecast?.hourly && (
@@ -226,6 +241,17 @@ export default function Home() {
                 </motion.button>
               </motion.div>
             )}
+
+            {/* Radar Map Modal */}
+            <AnimatePresence>
+              {showRadar && displayCurrent && (
+                <RadarMap
+                  lat={displayCurrent.lat}
+                  lon={displayCurrent.lon}
+                  onClose={() => setShowRadar(false)}
+                />
+              )}
+            </AnimatePresence>
 
             {!selectedCoords && !showLoading && (
               <motion.div
