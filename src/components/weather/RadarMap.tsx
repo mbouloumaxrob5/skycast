@@ -1,8 +1,8 @@
 'use client';
 
 import { useEffect, useRef, useState, useCallback } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { X, Play, Pause, Map as MapIcon, CloudRain, Wind } from 'lucide-react';
+import { motion } from 'framer-motion';
+import { X, Play, Pause, CloudRain, Wind } from 'lucide-react';
 import { cn } from '@/lib/utils/cn';
 
 interface RadarMapProps {
@@ -78,19 +78,6 @@ export function RadarMap({ lat, lon, onClose }: RadarMapProps) {
       }
     };
   }, [isPlaying, getFrames]);
-
-  // Generate tile URL
-  const getTileUrl = useCallback(() => {
-    const frames = getFrames();
-    if (frames.length === 0 || !radarData) return null;
-    
-    const frame = frames[currentFrame];
-    const timestamp = frame.time;
-    const path = frame.path;
-    
-    // RainViewer tiles URL pattern
-    return `https://${radarData.host}${path}/{z}/{x}/{y}/1/1_1.png`;
-  }, [radarData, currentFrame, getFrames]);
 
   const frames = getFrames();
   const currentTimestamp = frames[currentFrame]?.time;
@@ -192,7 +179,7 @@ export function RadarMap({ lat, lon, onClose }: RadarMapProps) {
           <p className="text-xs text-white/80 mb-2">Intensité des précipitations</p>
           <div className="flex items-center gap-1">
             <span className="text-[10px] text-white/60">Légère</span>
-            <div className="w-24 h-2 rounded-full bg-gradient-to-r from-blue-400 via-green-400 via-yellow-400 to-red-500" />
+            <div className="w-24 h-2 rounded-full bg-linear-to-r from-blue-400 via-yellow-400 to-red-500" />
             <span className="text-[10px] text-white/60">Forte</span>
           </div>
         </div>
