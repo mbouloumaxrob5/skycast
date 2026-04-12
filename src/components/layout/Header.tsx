@@ -6,6 +6,7 @@ import { Search, MapPin, X, Star, Loader2 } from 'lucide-react';
 import { cn } from '@/lib/utils/cn';
 import { useDebounce } from '@/hooks/useDebounce';
 import { ThemeToggle } from '@/components/ui/ThemeToggle';
+import { PushNotificationToggle } from '@/components/ui/PushNotificationToggle';
 import { City } from '@/types/weather';
 import { searchCities } from '@/lib/api/geocodingService';
 
@@ -253,6 +254,7 @@ export function Header({ onCitySelect, onGeolocate, isGeolocating, selectedCity,
             </motion.div>
           </motion.button>
           
+          <PushNotificationToggle />
           <ThemeToggle />
         </div>
         
