@@ -1,0 +1,44 @@
+{
+  "name": "SkyCast - L'assistant météo intelligent",
+  "short_name": "SkyCast",
+  "description": "Application météo moderne avec géolocalisation, prévisions 5 jours et thèmes adaptatifs",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0ea5e9",
+  "theme_color": "#0ea5e9",
+  "orientation": "portrait",
+  "scope": "/",
+  "lang": "fr",
+  "icons": [
+    {
+      "src": "/icons/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ],
+  "screenshots": [
+    {
+      "src": "/screenshots/mobile.png",
+      "sizes": "390x844",
+      "type": "image/png",
+      "form_factor": "narrow"
+    },
+    {
+      "src": "/screenshots/desktop.png",
+      "sizes": "1280x800",
+      "type": "image/png",
+      "form_factor": "wide"
+    }
+  ],
+  "categories": ["weather", "utilities"],
+  "shortcuts": [
+    {
+      "name": "Ma position",
+      "short_name": "Position",
+      "description": "Voir la météo de ma position actuelle",
+      "url": "/?geolocate=true",
+      "icons": [{ "src": "/icons/location.png", "sizes": "96x96" }]
+    }
+  ]
+}
