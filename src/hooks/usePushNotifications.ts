@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
+import { pushLogger } from '@/lib/utils/logger';
 
 export interface PushSubscriptionData {
   endpoint: string;
@@ -114,7 +115,7 @@ export function usePushNotifications() {
     } catch (err) {
       const message = err instanceof Error ? err.message : 'Erreur lors de la subscription';
       setError(message);
-      console.error('Push subscription error:', err);
+      pushLogger.error('Push subscription error:', err);
     } finally {
       setIsLoading(false);
     }
@@ -205,6 +206,13 @@ function urlBase64ToUint8Array(base64String: string): BufferSource {
 // Sauvegarder la subscription sur le serveur
 async function saveSubscription(subscription: PushSubscription): Promise<void> {
   try {
+    const p256dhKey = subscription.getKey('p256dh');
+    const authKey = subscription.getKey('auth');
+    
+    if (!p256dhKey || !authKey) {
+      throw new Error('Clés de subscription manquantes');
+    }
+    
     await fetch('/api/push/subscribe', {
       method: 'POST',
       headers: {
@@ -214,9 +222,9 @@ async function saveSubscription(subscription: PushSubscription): Promise<void> {
         endpoint: subscription.endpoint,
         keys: {
           p256dh: btoa(String.fromCharCode.apply(null, 
-            Array.from(new Uint8Array(subscription.getKey('p256dh')!)))),
+            Array.from(new Uint8Array(p256dhKey)))),
           auth: btoa(String.fromCharCode.apply(null, 
-            Array.from(new Uint8Array(subscription.getKey('auth')!)))),
+            Array.from(new Uint8Array(authKey)))),
         },
       }),
     });

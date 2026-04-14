@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useMemo, useSyncExternalStore } from 'react';
+import { useState, useMemo } from 'react';
 import { motion } from 'framer-motion';
 import { 
   BarChart3, 
@@ -19,7 +19,7 @@ import {
   WifiOff
 } from 'lucide-react';
 import { useAnalyticsStore } from '@/store/analyticsStore';
-import { AnalyticsEventType, AggregatedMetrics } from '@/types/analytics';
+import { AnalyticsEventType } from '@/types/analytics';
 import { cn } from '@/lib/utils/cn';
 
 interface StatCardProps {
@@ -28,46 +28,65 @@ interface StatCardProps {
   icon: React.ReactNode;
   trend?: 'up' | 'down' | 'neutral';
   trendValue?: string;
-  className?: string;
 }
 
-function StatCard({ title, value, icon, trend, trendValue, className }: StatCardProps) {
+function StatCard({ title, value, icon, trend, trendValue }: StatCardProps) {
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      className={cn(
-        'p-4 rounded-2xl backdrop-blur-md border',
-        'bg-white/10 dark:bg-white/10 light:bg-white/60',
-        'border-white/20 dark:border-white/20 light:border-gray-200',
-        className
-      )}
+      whileHover={{ scale: 1.02, y: -2 }}
     >
-      <div className="flex items-start justify-between">
-        <div className="p-2 rounded-xl bg-white/10 dark:bg-white/10 light:bg-blue-500/10">
+      {/* Background gradient glow */}
+      <div className="absolute -inset-px bg-linear-to-br from-blue-500/10 via-purple-500/10 to-pink-500/10 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500 blur-xl" />
+      
+      {/* Top shine effect */}
+      <div className="absolute inset-x-0 top-0 h-px bg-linear-to-r from-transparent via-white/30 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+      
+      <div className="relative flex items-start justify-between mb-3">
+        <motion.div 
+          className="p-2.5 rounded-xl bg-linear-to-br from-white/10 to-white/5 border border-white/10 group-hover:border-white/20 transition-all shadow-inner"
+          whileHover={{ rotate: [0, -5, 5, 0] }}
+          transition={{ duration: 0.5 }}
+        >
           {icon}
-        </div>
+        </motion.div>
         {trend && trendValue && (
-          <div className={cn(
-            'flex items-center gap-1 text-xs font-medium',
-            trend === 'up' && 'text-emerald-400',
-            trend === 'down' && 'text-rose-400',
-            trend === 'neutral' && 'text-white/60'
-          )}>
+          <motion.div
+            initial={{ opacity: 0, x: 10 }}
+            animate={{ opacity: 1, x: 0 }}
+            className={cn(
+              'flex items-center gap-1 text-xs font-semibold px-2.5 py-1 rounded-full backdrop-blur-sm border',
+              trend === 'up' && 'text-emerald-400 bg-emerald-500/10 border-emerald-500/30',
+              trend === 'down' && 'text-rose-400 bg-rose-500/10 border-rose-500/30',
+              trend === 'neutral' && 'text-white/60 bg-white/5 border-white/20'
+            )}
+          >
             {trend === 'up' && <TrendingUp className="w-3 h-3" />}
             {trend === 'down' && <TrendingDown className="w-3 h-3" />}
             {trendValue}
-          </div>
+          </motion.div>
         )}
       </div>
-      <div className="mt-3">
-        <p className="text-2xl font-bold text-white dark:text-white light:text-gray-900">
+      <div className="relative mt-4">
+        <motion.p 
+          className="text-3xl font-bold bg-linear-to-r from-white via-white to-white/80 bg-clip-text text-transparent tracking-tight"
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.1 }}
+        >
           {value}
-        </p>
-        <p className="text-sm text-white/60 dark:text-white/60 light:text-gray-500">
+        </motion.p>
+        <p className="text-sm text-white/50 mt-1 font-medium">
           {title}
         </p>
       </div>
+      
+      {/* Bottom accent gradient line */}
+      <div className="absolute bottom-0 left-4 right-4 h-0.5 bg-linear-to-r from-blue-500/0 via-blue-500/50 to-blue-500/0 opacity-0 group-hover:opacity-100 transition-all duration-500 rounded-full" />
+      
+      {/* Corner decoration */}
+      <div className="absolute top-0 right-0 w-16 h-16 bg-linear-to-bl from-white/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 rounded-tr-2xl" />
     </motion.div>
   );
 }
@@ -86,9 +105,9 @@ function EventBar({ type, count, total, color }: EventBarProps) {
     page_view: 'Pages vues',
     city_search: 'Recherches',
     city_select: 'Villes sélectionnées',
-    geolocation_request: 'Demandes de géoloc',
-    geolocation_success: 'Géoloc réussies',
-    geolocation_error: 'Erreurs géoloc',
+    geolocation_request: 'Géolocalisation',
+    geolocation_success: 'Géoloc. réussies',
+    geolocation_error: 'Erreurs géoloc.',
     weather_fetch: 'Données météo',
     weather_error: 'Erreurs météo',
     forecast_fetch: 'Prévisions',
@@ -104,22 +123,28 @@ function EventBar({ type, count, total, color }: EventBarProps) {
   };
 
   return (
-    <div className="flex items-center gap-3 py-2">
-      <span className="w-32 text-xs text-white/70 dark:text-white/70 light:text-gray-600 truncate">
+    <motion.div 
+      className="group flex items-center gap-3 py-2.5 px-3 -mx-3 rounded-xl hover:bg-white/5 transition-colors"
+      whileHover={{ x: 4 }}
+    >
+      <span className="w-32 text-sm text-white/70 truncate">
         {labels[type] || type}
       </span>
-      <div className="flex-1 h-2 bg-white/10 dark:bg-white/10 light:bg-gray-200 rounded-full overflow-hidden">
+      <div className="flex-1 h-2.5 bg-white/5 rounded-full overflow-hidden">
         <motion.div
           initial={{ width: 0 }}
           animate={{ width: `${percentage}%` }}
-          transition={{ duration: 0.5, ease: 'easeOut' }}
-          className={cn('h-full rounded-full', color)}
-        />
+          transition={{ duration: 0.8, ease: 'easeOut', delay: 0.1 }}
+          className={cn('h-full rounded-full relative', color)}
+        >
+          {/* Shimmer effect */}
+          <div className="absolute inset-0 bg-linear-to-r from-transparent via-white/30 to-transparent animate-shimmer" />
+        </motion.div>
       </div>
-      <span className="w-8 text-xs text-white/60 dark:text-white/60 light:text-gray-500 text-right">
+      <span className="w-10 text-sm font-medium text-white/70 text-right tabular-nums">
         {count}
       </span>
-    </div>
+    </motion.div>
   );
 }
 
@@ -144,58 +169,76 @@ const EVENT_COLORS: Record<AnalyticsEventType, string> = {
   theme_toggle: 'bg-lime-500',
 };
 
-// Simple time store for getting current time
-function subscribe(callback: () => void) {
-  const interval = setInterval(callback, 60000); // Update every minute
-  return () => clearInterval(interval);
-}
-
-function getSnapshot() {
-  return Date.now();
-}
-
-function getServerSnapshot() {
-  return Date.now();
-}
-
 export function AnalyticsDashboard() {
   const [timeRange, setTimeRange] = useState<'today' | 'week' | 'all'>('today');
-  const now = useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot);
-  const store = useAnalyticsStore();
-
-  const metrics: AggregatedMetrics = useMemo(() => {
-    // Calculate range based on timeRange selection
-    let range;
+  
+  // Subscribe only to specific store values to avoid unnecessary re-renders
+  const events = useAnalyticsStore((state) => state.events);
+  const performance = useAnalyticsStore((state) => state.performance);
+  const errors = useAnalyticsStore((state) => state.errors);
+  
+  // Calculate metrics from raw store data
+  const metrics = useMemo(() => {
+    const now = Date.now();
+    let startTime = 0;
     
     switch (timeRange) {
       case 'today':
-        range = { start: now - 24 * 60 * 60 * 1000, end: now };
+        startTime = now - 24 * 60 * 60 * 1000;
         break;
       case 'week':
-        range = { start: now - 7 * 24 * 60 * 60 * 1000, end: now };
+        startTime = now - 7 * 24 * 60 * 60 * 1000;
         break;
       default:
-        range = undefined;
+        startTime = 0;
     }
     
-    return store.getAggregatedMetrics(range);
-  }, [timeRange, now, store]);
-
-  const sessionDuration = useMemo(() => {
-    const duration = metrics.sessionDuration;
-    const hours = Math.floor(duration / (1000 * 60 * 60));
-    const minutes = Math.floor((duration % (1000 * 60 * 60)) / (1000 * 60));
-    return hours > 0 ? `${hours}h ${minutes}m` : `${minutes}m`;
-  }, [metrics.sessionDuration]);
-
-  const avgResponseTime = useMemo(() => {
-    return metrics.averageApiResponseTime > 0 
-      ? `${metrics.averageApiResponseTime.toFixed(0)}ms` 
-      : 'N/A';
-  }, [metrics.averageApiResponseTime]);
+    // Filter events by time range
+    const filteredEvents = startTime > 0 
+      ? events.filter((e) => e.timestamp >= startTime)
+      : events;
+    
+    // Count events by type
+    const eventsByType: Record<string, number> = {};
+    filteredEvents.forEach((e) => {
+      eventsByType[e.type] = (eventsByType[e.type] || 0) + 1;
+    });
+    
+    // Calculate average response time from performance arrays
+    const apiTimes = performance.apiResponseTime || [];
+    const avgResponseTime = apiTimes.length > 0
+      ? apiTimes.reduce((sum: number, m: number) => sum + m, 0) / apiTimes.length
+      : 0;
+    
+    // Calculate total errors from error metrics
+    const totalErrorCount = (errors.weatherErrors || 0) + 
+                          (errors.geolocationErrors || 0) + 
+                          (errors.apiErrors || 0) + 
+                          (errors.networkErrors || 0);
+    const errorRate = filteredEvents.length > 0 
+      ? (totalErrorCount / filteredEvents.length) * 100 
+      : 0;
+    
+    // Get unique cities from search events (stored in data.cityName)
+    const uniqueCities = new Set(
+      filteredEvents
+        .filter((e) => e.type === 'city_search' && e.data?.cityName)
+        .map((e) => e.data?.cityName as string)
+    );
+    
+    return {
+      totalEvents: filteredEvents.length,
+      eventsByType,
+      sessionDuration: 0, // Non disponible dans UsageMetrics actuel
+      averageApiResponseTime: avgResponseTime,
+      totalErrors: totalErrorCount,
+      errorRate,
+      uniqueCitiesCount: uniqueCities.size,
+    };
+  }, [events, performance, errors, timeRange]);
 
   const handleExport = () => {
-    const data = store.exportData();
+    const data = useAnalyticsStore.getState().exportData();
     const blob = new Blob([data], { type: 'application/json' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
@@ -209,7 +252,7 @@ export function AnalyticsDashboard() {
 
   const handleReset = () => {
     if (confirm('Êtes-vous sûr de vouloir réinitialiser toutes les données d\'analytics ?')) {
-      store.reset();
+      useAnalyticsStore.getState().reset();
     }
   };
 
@@ -289,13 +332,18 @@ export function AnalyticsDashboard() {
         />
         <StatCard
           title="Temps de réponse API"
-          value={avgResponseTime}
+          value={metrics.averageApiResponseTime > 0 ? `${metrics.averageApiResponseTime.toFixed(0)}ms` : 'N/A'}
           icon={<Clock className="w-5 h-5 text-emerald-400" />}
           trend="neutral"
         />
         <StatCard
           title="Durée session"
-          value={sessionDuration}
+          value={(() => {
+            const duration = metrics.sessionDuration;
+            const hours = Math.floor(duration / (1000 * 60 * 60));
+            const minutes = Math.floor((duration % (1000 * 60 * 60)) / (1000 * 60));
+            return hours > 0 ? `${hours}h ${minutes}m` : `${minutes}m`;
+          })()}
           icon={<Globe className="w-5 h-5 text-violet-400" />}
           trend="neutral"
         />
@@ -305,7 +353,7 @@ export function AnalyticsDashboard() {
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         <StatCard
           title="Recherches"
-          value={store.usage.totalSearches}
+          value={useAnalyticsStore.getState().usage.totalSearches}
           icon={<Search className="w-5 h-5 text-cyan-400" />}
         />
         <StatCard
@@ -315,12 +363,12 @@ export function AnalyticsDashboard() {
         />
         <StatCard
           title="Favoris"
-          value={store.usage.totalFavorites}
+          value={useAnalyticsStore.getState().usage.totalFavorites}
           icon={<Heart className="w-5 h-5 text-pink-400" />}
         />
         <StatCard
           title="Radar ouvert"
-          value={store.usage.radarOpens}
+          value={useAnalyticsStore.getState().usage.radarOpens}
           icon={<BarChart3 className="w-5 h-5 text-amber-400" />}
         />
       </div>
@@ -375,31 +423,34 @@ export function AnalyticsDashboard() {
           <div className="space-y-3">
             <div className="flex items-center justify-between p-3 rounded-xl bg-rose-500/10">
               <span className="text-sm text-white/70">Erreurs météo</span>
-              <span className="text-lg font-bold text-rose-400">{store.errors.weatherErrors}</span>
+              <span className="text-lg font-bold text-rose-400">{useAnalyticsStore.getState().errors.weatherErrors}</span>
             </div>
             <div className="flex items-center justify-between p-3 rounded-xl bg-orange-500/10">
               <span className="text-sm text-white/70">Erreurs géoloc</span>
-              <span className="text-lg font-bold text-orange-400">{store.errors.geolocationErrors}</span>
+              <span className="text-lg font-bold text-orange-400">{useAnalyticsStore.getState().errors.geolocationErrors}</span>
             </div>
             <div className="flex items-center justify-between p-3 rounded-xl bg-amber-500/10">
               <span className="text-sm text-white/70">Erreurs API</span>
-              <span className="text-lg font-bold text-amber-400">{store.errors.apiErrors}</span>
+              <span className="text-lg font-bold text-amber-400">{useAnalyticsStore.getState().errors.apiErrors}</span>
             </div>
             <div className="flex items-center justify-between p-3 rounded-xl bg-yellow-500/10">
               <span className="text-sm text-white/70">Erreurs réseau</span>
-              <span className="text-lg font-bold text-yellow-400">{store.errors.networkErrors}</span>
+              <span className="text-lg font-bold text-yellow-400">{useAnalyticsStore.getState().errors.networkErrors}</span>
             </div>
           </div>
           
-          {store.errors.lastError && (
-            <div className="mt-4 p-3 rounded-xl bg-white/5 border border-white/10">
-              <p className="text-xs text-white/50 mb-1">Dernière erreur</p>
-              <p className="text-sm text-white/80">{store.errors.lastError.message}</p>
-              <p className="text-xs text-white/40 mt-1">
-                {new Date(store.errors.lastError.timestamp).toLocaleString('fr-FR')}
-              </p>
-            </div>
-          )}
+          {(() => {
+            const lastError = useAnalyticsStore.getState().errors.lastError;
+            return lastError && (
+              <div className="mt-4 p-3 rounded-xl bg-white/5 border border-white/10">
+                <p className="text-xs text-white/50 mb-1">Dernière erreur</p>
+                <p className="text-sm text-white/80">{lastError.message}</p>
+                <p className="text-xs text-white/40 mt-1">
+                  {new Date(lastError.timestamp).toLocaleString('fr-FR')}
+                </p>
+              </div>
+            );
+          })()}
         </motion.div>
       </div>
 
@@ -420,32 +471,32 @@ export function AnalyticsDashboard() {
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
           <div className="text-center p-4 rounded-xl bg-white/5">
             <p className="text-2xl font-bold text-emerald-400">
-              {store.performance.apiResponseTime.length > 0 
-                ? Math.round(store.performance.apiResponseTime.reduce((a, b) => a + b, 0) / store.performance.apiResponseTime.length)
+              {useAnalyticsStore.getState().performance.apiResponseTime.length > 0 
+                ? Math.round(useAnalyticsStore.getState().performance.apiResponseTime.reduce((a, b) => a + b, 0) / useAnalyticsStore.getState().performance.apiResponseTime.length)
                 : 0}ms
             </p>
             <p className="text-xs text-white/60 mt-1">API moyenne</p>
           </div>
           <div className="text-center p-4 rounded-xl bg-white/5">
             <p className="text-2xl font-bold text-sky-400">
-              {store.performance.weatherLoadTime.length > 0 
-                ? Math.round(store.performance.weatherLoadTime.reduce((a, b) => a + b, 0) / store.performance.weatherLoadTime.length)
+              {useAnalyticsStore.getState().performance.weatherLoadTime.length > 0 
+                ? Math.round(useAnalyticsStore.getState().performance.weatherLoadTime.reduce((a, b) => a + b, 0) / useAnalyticsStore.getState().performance.weatherLoadTime.length)
                 : 0}ms
             </p>
             <p className="text-xs text-white/60 mt-1">Chargement météo</p>
           </div>
           <div className="text-center p-4 rounded-xl bg-white/5">
             <p className="text-2xl font-bold text-violet-400">
-              {store.performance.forecastLoadTime.length > 0 
-                ? Math.round(store.performance.forecastLoadTime.reduce((a, b) => a + b, 0) / store.performance.forecastLoadTime.length)
+              {useAnalyticsStore.getState().performance.forecastLoadTime.length > 0 
+                ? Math.round(useAnalyticsStore.getState().performance.forecastLoadTime.reduce((a, b) => a + b, 0) / useAnalyticsStore.getState().performance.forecastLoadTime.length)
                 : 0}ms
             </p>
             <p className="text-xs text-white/60 mt-1">Chargement prévisions</p>
           </div>
           <div className="text-center p-4 rounded-xl bg-white/5">
             <p className="text-2xl font-bold text-indigo-400">
-              {store.performance.geolocationTime.length > 0 
-                ? Math.round(store.performance.geolocationTime.reduce((a, b) => a + b, 0) / store.performance.geolocationTime.length)
+              {useAnalyticsStore.getState().performance.geolocationTime.length > 0 
+                ? Math.round(useAnalyticsStore.getState().performance.geolocationTime.reduce((a, b) => a + b, 0) / useAnalyticsStore.getState().performance.geolocationTime.length)
                 : 0}ms
             </p>
             <p className="text-xs text-white/60 mt-1">Géolocalisation</p>
@@ -473,7 +524,7 @@ export function AnalyticsDashboard() {
               <Heart className="w-5 h-5 text-pink-400" />
             </div>
             <div>
-              <p className="text-xl font-bold text-white">{store.usage.totalFavorites}</p>
+              <p className="text-xl font-bold text-white">{useAnalyticsStore.getState().usage.totalFavorites}</p>
               <p className="text-xs text-white/60">Favoris</p>
             </div>
           </div>
@@ -482,7 +533,7 @@ export function AnalyticsDashboard() {
               <BarChart3 className="w-5 h-5 text-amber-400" />
             </div>
             <div>
-              <p className="text-xl font-bold text-white">{store.usage.radarOpens}</p>
+              <p className="text-xl font-bold text-white">{useAnalyticsStore.getState().usage.radarOpens}</p>
               <p className="text-xs text-white/60">Radar</p>
             </div>
           </div>
@@ -491,7 +542,7 @@ export function AnalyticsDashboard() {
               <AlertTriangle className="w-5 h-5 text-yellow-400" />
             </div>
             <div>
-              <p className="text-xl font-bold text-white">{store.usage.alertsViewed}</p>
+              <p className="text-xl font-bold text-white">{useAnalyticsStore.getState().usage.alertsViewed}</p>
               <p className="text-xs text-white/60">Alertes</p>
             </div>
           </div>
@@ -500,7 +551,7 @@ export function AnalyticsDashboard() {
               <WifiOff className="w-5 h-5 text-slate-400" />
             </div>
             <div>
-              <p className="text-xl font-bold text-white">{store.usage.offlineEvents}</p>
+              <p className="text-xl font-bold text-white">{useAnalyticsStore.getState().usage.offlineEvents}</p>
               <p className="text-xs text-white/60">Mode offline</p>
             </div>
           </div>

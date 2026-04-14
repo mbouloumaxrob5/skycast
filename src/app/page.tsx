@@ -23,7 +23,7 @@ import { OfflineIndicator } from '@/components/ui/OfflineIndicator';
 import { WeatherAlerts } from '@/components/ui/WeatherAlerts';
 import { AlertBadge } from '@/components/layout/AlertBadge';
 import { City, FavoriteCity, CurrentWeather, ForecastData } from '@/types/weather';
-import { BarChart3 } from 'lucide-react';
+import { BarChart3, Radar, ChevronRight, Heart } from 'lucide-react';
 import Link from 'next/link';
 
 export default function Home() {
@@ -215,17 +215,34 @@ export default function Home() {
               >
                 <HeroCard weather={displayCurrent} />
                 
-                {/* Bouton Radar */}
+                {/* Bouton Radar amélioré */}
                 <motion.button
-                  whileHover={{ scale: 1.02 }}
-                  whileTap={{ scale: 0.98 }}
+                  whileHover={{ scale: 1.03, y: -2 }}
+                  whileTap={{ scale: 0.97 }}
                   onClick={() => setShowRadar(true)}
-                  className="w-full py-3 rounded-xl bg-linear-to-r from-blue-500/20 to-cyan-500/20 border border-blue-500/30 text-white hover:from-blue-500/30 hover:to-cyan-500/30 transition-all flex items-center justify-center gap-2"
+                  className="relative w-full py-4 rounded-2xl bg-linear-to-r from-blue-500/30 via-cyan-500/30 to-blue-500/30 dark:from-blue-500/20 dark:via-cyan-500/20 dark:to-blue-500/20 border border-blue-400/30 dark:text-white text-slate-800 overflow-hidden group shadow-lg shadow-blue-500/10 hover:shadow-xl hover:shadow-blue-500/20 transition-all"
                 >
-                  <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7" />
-                  </svg>
-                  Voir le radar des précipitations
+                  {/* Animated background */}
+                  <motion.div 
+                    className="absolute inset-0 bg-linear-to-r from-blue-500/0 via-cyan-500/20 to-blue-500/0"
+                    animate={{ x: ["-100%", "100%"] }}
+                    transition={{ duration: 3, repeat: Infinity, ease: "linear" }}
+                  />
+                  <div className="relative flex items-center justify-center gap-3">
+                    <motion.div
+                      animate={{ rotate: [0, 360] }}
+                      transition={{ duration: 8, repeat: Infinity, ease: "linear" }}
+                    >
+                      <Radar className="w-5 h-5" />
+                    </motion.div>
+                    <span className="font-semibold">Voir le radar des précipitations</span>
+                    <motion.div
+                      animate={{ x: [0, 4, 0] }}
+                      transition={{ duration: 1.5, repeat: Infinity }}
+                    >
+                      <ChevronRight className="w-5 h-5" />
+                    </motion.div>
+                  </div>
                 </motion.button>
                 
                 <DetailGrid weather={displayCurrent} />
@@ -243,35 +260,67 @@ export default function Home() {
                 />
 
                 <motion.button
-                  whileHover={{ scale: 1.02 }}
-                  whileTap={{ scale: 0.98 }}
+                  whileHover={{ scale: 1.03, y: -2 }}
+                  whileTap={{ scale: 0.97 }}
                   onClick={handleAddToFavorites}
-                  className="w-full py-3 rounded-xl bg-white/10 border border-white/20 text-white hover:bg-white/20 transition-colors"
+                  className="relative w-full py-4 rounded-2xl bg-linear-to-br from-amber-500/30 to-orange-500/30 dark:from-amber-500/20 dark:to-orange-500/20 border border-amber-400/30 dark:text-white text-slate-800 overflow-hidden group shadow-lg shadow-amber-500/10 hover:shadow-xl hover:shadow-amber-500/20 transition-all"
                 >
-                  Ajouter {displayCurrent.city} aux favoris
+                  {/* Heart pulse effect */}
+                  <motion.div
+                    className="absolute inset-0 bg-amber-500/10"
+                    animate={{ scale: [1, 1.2, 1], opacity: [0, 0.3, 0] }}
+                    transition={{ duration: 2, repeat: Infinity }}
+                  />
+                  <div className="relative flex items-center justify-center gap-2">
+                    <motion.div
+                      animate={{ scale: [1, 1.2, 1] }}
+                      transition={{ duration: 1.5, repeat: Infinity }}
+                    >
+                      <Heart className="w-5 h-5 text-amber-400" />
+                    </motion.div>
+                    <span className="font-semibold">Ajouter {displayCurrent.city} aux favoris</span>
+                  </div>
                 </motion.button>
               </motion.div>
             )}
 
             {!selectedCoords && !showLoading && (
               <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                className="text-center py-20"
+                initial={{ opacity: 0, y: 20, scale: 0.95 }}
+                animate={{ opacity: 1, y: 0, scale: 1 }}
+                transition={{ type: "spring", stiffness: 200, damping: 20 }}
+                className="text-center py-20 px-4"
               >
-                <p className="text-white/70 text-lg">
-                  Recherchez une ville ou utilisez la géolocalisation pour voir la météo
+                <motion.div 
+                  className="w-24 h-24 mx-auto mb-8 rounded-3xl bg-linear-to-br from-blue-500/20 to-cyan-500/20 flex items-center justify-center border border-blue-400/20 shadow-xl shadow-blue-500/10"
+                  animate={{ 
+                    scale: [1, 1.05, 1],
+                    rotate: [0, 5, -5, 0]
+                  }}
+                  transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
+                >
+                  <span className="text-4xl">☁️</span>
+                </motion.div>
+                <h3 className="text-2xl font-bold text-slate-800 dark:text-white mb-3">
+                  Bienvenue sur SkyCast
+                </h3>
+                <p className="text-slate-600 dark:text-white/60 text-lg max-w-md mx-auto leading-relaxed">
+                  Recherchez une ville ou utilisez la géolocalisation pour obtenir des prévisions météo précises
                 </p>
+                <div className="flex items-center justify-center gap-2 mt-6 text-slate-500 dark:text-white/40 text-sm">
+                  <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+                  <span>Données en temps réel</span>
+                </div>
               </motion.div>
             )}
           </AnimatePresence>
         </main>
 
-        <footer className="w-full py-4 flex items-center justify-center gap-4 text-sm text-white/50">
+        <footer className="w-full py-4 flex items-center justify-center gap-4 text-sm text-slate-500 dark:text-white/50">
           <span>SkyCast 2025 - Données fournies par OpenWeatherMap</span>
           <Link 
             href="/analytics" 
-            className="flex items-center gap-1 hover:text-white transition-colors"
+            className="flex items-center gap-1 text-slate-600 dark:text-white/70 hover:text-slate-800 dark:hover:text-white transition-colors"
           >
             <BarChart3 className="w-4 h-4" />
             Analytics

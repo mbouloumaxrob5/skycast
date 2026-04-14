@@ -18,6 +18,8 @@ export interface CurrentWeather {
   lon: number;
   temperature: number;
   feelsLike: number;
+  tempMin?: number;
+  tempMax?: number;
   humidity: number;
   pressure: number;
   windSpeed: number;

@@ -13,7 +13,7 @@ function subscribe(callback: () => void) {
 }
 
 function getSnapshot(): boolean {
-  return !navigator.onLine;
+  return typeof navigator !== 'undefined' ? !navigator.onLine : false;
 }
 
 function getServerSnapshot(): boolean {

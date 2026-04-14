@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect } from 'react';
+import { swLogger } from '@/lib/utils/logger';
 
 export function ServiceWorkerRegistration() {
   useEffect(() => {
@@ -13,10 +14,10 @@ export function ServiceWorkerRegistration() {
       navigator.serviceWorker
         .register('/sw.js')
         .then((registration) => {
-          console.log('Service Worker enregistré:', registration.scope);
+          swLogger.debug('Service Worker enregistré:', registration.scope);
         })
         .catch((error) => {
-          console.error('Erreur lors de l\'enregistrement du Service Worker:', error);
+          swLogger.error('Erreur lors de l\'enregistrement du Service Worker:', error);
         });
     }
   }, []);

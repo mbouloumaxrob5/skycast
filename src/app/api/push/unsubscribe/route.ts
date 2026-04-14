@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { pushLogger } from '@/lib/utils/logger';
 
 // Référence au même Map que subscribe (en production, utiliser une DB)
 const subscriptions = new Map<string, { endpoint: string; keys: { p256dh: string; auth: string } }>();
@@ -24,15 +25,19 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    console.log(`Subscription supprimée: ${endpoint.substring(0, 50)}...`);
+    pushLogger.debug(`Subscription supprimée: ${endpoint.substring(0, 50)}...`);
 
     return NextResponse.json(
       { success: true, message: 'Subscription supprimée' },
       { status: 200 }
     );
-  } catch {
+  } catch (error) {
+    pushLogger.error('Erreur lors de la suppression de la subscription:', { error });
     return NextResponse.json(
-      { error: 'Erreur lors de la suppression de la subscription' },
+      { 
+        error: 'Erreur lors de la suppression de la subscription',
+        details: error instanceof Error ? error.message : 'Erreur inconnue'
+      },
       { status: 500 }
     );
   }

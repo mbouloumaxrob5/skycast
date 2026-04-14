@@ -1,3 +1,5 @@
+'use client';
+
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { FavoriteCity, City } from '@/types/weather';
@@ -44,7 +46,7 @@ export const useWeatherStore = create<WeatherState>()(
         const favorites = get().favorites;
         
         if (favorites.some(f => f.id === id)) return;
-        if (favorites.length >= 5) {
+        if (favorites.length >= 15) {
           favorites.pop();
         }
         

@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useRef, useEffect } from 'react';
+import { useCallback, useRef, useEffect, useMemo } from 'react';
 import { useAnalyticsStore } from '@/store/analyticsStore';
 import { analytics } from '@/lib/analytics/analyticsService';
 import { AnalyticsEventType, TimeRange, AggregatedMetrics } from '@/types/analytics';
@@ -85,7 +85,6 @@ export function useTrackField(fieldName: string) {
 // Hook for tracking loading states
 export function useTrackLoading(resourceName: string) {
   const startTimeRef = useRef<number | null>(null);
-  const store = useAnalyticsStore();
 
   useEffect(() => {
     startTimeRef.current = performance.now();
@@ -93,6 +92,7 @@ export function useTrackLoading(resourceName: string) {
     return () => {
       if (startTimeRef.current) {
         const duration = performance.now() - startTimeRef.current;
+        const store = useAnalyticsStore.getState();
         
         // Track based on resource type
         if (resourceName.includes('weather')) {
@@ -106,12 +106,13 @@ export function useTrackLoading(resourceName: string) {
         startTimeRef.current = null;
       }
     };
-  }, [resourceName, store]);
+  }, [resourceName]);
 
   return {
     markComplete: () => {
       if (startTimeRef.current) {
         const duration = performance.now() - startTimeRef.current;
+        const store = useAnalyticsStore.getState();
         
         if (resourceName.includes('weather')) {
           store.trackWeatherLoadTime(duration);
@@ -130,13 +131,17 @@ export function useTrackLoading(resourceName: string) {
 // Hook for accessing analytics metrics
 export function useAnalyticsMetrics(range?: TimeRange): AggregatedMetrics {
   const store = useAnalyticsStore();
-  return store.getAggregatedMetrics(range);
+  
+  // Utiliser useMemo pour éviter de recalculer à chaque rendu
+  return useMemo(() => {
+    return store.getAggregatedMetrics(range);
+  }, [store, range]);
 }
 
 // Hook for tracking offline/online status
 export function useTrackConnectivity() {
-  const store = useAnalyticsStore();
-  const lastStateRef = useRef<boolean>(navigator.onLine);
+  // Safe SSR: navigator n'existe pas côté serveur
+  const lastStateRef = useRef<boolean>(typeof navigator !== 'undefined' ? navigator.onLine : true);
 
   useEffect(() => {
     const handleOnline = () => {
@@ -160,7 +165,7 @@ export function useTrackConnectivity() {
       window.removeEventListener('online', handleOnline);
       window.removeEventListener('offline', handleOffline);
     };
-  }, [store]);
+  }, []); // dépendances vides car on utilise analytics directement, pas besoin de store
 }
 
 // Re-export analytics service for convenience

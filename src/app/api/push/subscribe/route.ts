@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { pushLogger } from '@/lib/utils/logger';
 
 // Stockage temporaire en mémoire (en production, utiliser une DB)
 const subscriptions = new Map<string, PushSubscriptionData>();
@@ -25,16 +26,19 @@ export async function POST(request: NextRequest) {
     // Stocker la subscription (utiliser l'endpoint comme clé unique)
     subscriptions.set(data.endpoint, data);
 
-    // Log pour debug (à supprimer en production)
-    console.log(`Nouvelle subscription: ${data.endpoint.substring(0, 50)}...`);
+    pushLogger.debug(`Nouvelle subscription: ${data.endpoint.substring(0, 50)}...`);
 
     return NextResponse.json(
       { success: true, message: 'Subscription enregistrée' },
       { status: 201 }
     );
-  } catch {
+  } catch (error) {
+    pushLogger.error('Erreur lors de la sauvegarde de la subscription:', { error });
     return NextResponse.json(
-      { error: 'Erreur lors de l\'enregistrement de la subscription' },
+      { 
+        error: 'Erreur lors de la sauvegarde de la subscription',
+        details: error instanceof Error ? error.message : 'Erreur inconnue'
+      },
       { status: 500 }
     );
   }

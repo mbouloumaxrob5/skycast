@@ -2,7 +2,8 @@
 
 import React, { useState, useRef, useCallback, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Search, MapPin, X, Star, Loader2 } from 'lucide-react';
+import { Search, MapPin, X, Star, Loader2, Settings } from 'lucide-react';
+import Link from 'next/link';
 import { cn } from '@/lib/utils/cn';
 import { useDebounce } from '@/hooks/useDebounce';
 import { ThemeToggle } from '@/components/ui/ThemeToggle';
@@ -13,11 +14,12 @@ import { useTranslations } from 'next-intl';
 import { searchCities } from '@/lib/api/geocodingService';
 
 interface HeaderProps {
-  onCitySelect: (city: City) => void;
-  onGeolocate: () => void;
+  onCitySelect?: (city: City) => void;
+  onGeolocate?: () => void;
   isGeolocating?: boolean;
-  selectedCity: City | null;
+  selectedCity?: City | null;
   alertBadge?: React.ReactNode;
+  hideSearch?: boolean;
 }
 
 export function Header({ onCitySelect, onGeolocate, isGeolocating, selectedCity, alertBadge }: HeaderProps) {
@@ -62,7 +64,7 @@ export function Header({ onCitySelect, onGeolocate, isGeolocating, selectedCity,
   }, [fetchSuggestions]);
   
   const handleSelect = (city: City) => {
-    onCitySelect(city);
+    onCitySelect?.(city);
     setSearchQuery('');
     setSuggestions([]);
     setShowSuggestions(false);
@@ -120,12 +122,66 @@ export function Header({ onCitySelect, onGeolocate, isGeolocating, selectedCity,
     <header className="sticky top-0 z-50 w-full backdrop-blur-xl bg-black/20 dark:bg-black/20 light:bg-white/70 border-b border-white/10 dark:border-white/10 light:border-gray-200/50">
       <div className="max-w-6xl mx-auto px-4 py-4">
         <div className="flex items-center gap-4">
-          <div className="flex items-center gap-2">
-            <div className="w-10 h-10 rounded-xl bg-linear-to-br from-blue-400 to-cyan-300 flex items-center justify-center">
-              <span className="text-xl">☁️</span>
+          <motion.div 
+            className="flex items-center gap-3 group cursor-pointer"
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.98 }}
+            transition={{ type: "spring", stiffness: 400, damping: 17 }}
+          >
+            <div className="relative w-12 h-12 rounded-2xl bg-linear-to-br from-sky-400 via-blue-500 to-indigo-600 flex items-center justify-center shadow-xl shadow-blue-500/30 overflow-hidden ring-2 ring-white/20 ring-offset-2 ring-offset-transparent">
+              {/* Animated gradient background */}
+              <motion.div
+                className="absolute inset-0 bg-linear-to-br from-cyan-300/60 via-blue-400/40 to-transparent"
+                animate={{ 
+                  opacity: [0.4, 0.7, 0.4],
+                  scale: [1, 1.1, 1],
+                }}
+                transition={{ 
+                  duration: 4,
+                  repeat: Infinity,
+                  ease: "easeInOut"
+                }}
+              />
+              {/* Rotating shine effect */}
+              <motion.div
+                className="absolute inset-0 bg-linear-to-r from-transparent via-white/30 to-transparent"
+                animate={{ 
+                  rotate: [0, 360],
+                }}
+                transition={{ 
+                  duration: 8,
+                  repeat: Infinity,
+                  ease: "linear"
+                }}
+                style={{ transformOrigin: "center" }}
+              />
+              <motion.span 
+                className="relative text-2xl drop-shadow-lg"
+                animate={{ 
+                  y: [0, -2, 0],
+                }}
+                transition={{ 
+                  duration: 2,
+                  repeat: Infinity,
+                  ease: "easeInOut"
+                }}
+              >
+                ☁️
+              </motion.span>
             </div>
-            <h1 className="text-xl font-bold text-white dark:text-white light:text-gray-900 hidden sm:block">SkyCast</h1>
-          </div>
+            <div className="hidden sm:flex flex-col">
+              <motion.h1 
+                className="text-xl font-bold bg-linear-to-r from-white to-white/80 bg-clip-text text-transparent tracking-tight leading-tight"
+                whileHover={{ x: 2 }}
+                transition={{ type: "spring", stiffness: 400 }}
+              >
+                SkyCast
+              </motion.h1>
+              <span className="text-[10px] text-white/50 dark:text-white/50 light:text-slate-500 uppercase tracking-widest font-semibold">
+                Weather
+              </span>
+            </div>
+          </motion.div>
           
           {alertBadge && (
             <div className="hidden sm:block">
@@ -236,21 +292,27 @@ export function Header({ onCitySelect, onGeolocate, isGeolocating, selectedCity,
           </div>
           
           <motion.button
-            whileHover={{ scale: 1.05 }}
+            whileHover={{ scale: 1.05, backgroundColor: "rgba(255,255,255,0.2)" }}
             whileTap={{ scale: 0.95 }}
-            onClick={onGeolocate}
+            onClick={() => onGeolocate?.()}
             disabled={isGeolocating}
             className={cn(
               "p-2.5 rounded-xl",
-              "bg-white/10 dark:bg-white/10 light:bg-white/80 border border-white/20 dark:border-white/20 light:border-gray-300",
-              "text-white dark:text-white light:text-gray-700 hover:bg-white/20 dark:hover:bg-white/20 light:hover:bg-gray-100",
+              "bg-white/10 dark:bg-white/10 light:bg-white/80",
+              "border border-white/20 dark:border-white/20 light:border-slate-200",
+              "text-white dark:text-white light:text-slate-700",
+              "hover:border-white/40 dark:hover:border-white/40 light:hover:border-slate-300",
               "disabled:opacity-50 disabled:cursor-not-allowed",
-              "transition-colors"
+              "transition-all duration-200",
+              "shadow-sm"
             )}
             title={t('myLocation')}
           >
             <motion.div
-              animate={isGeolocating ? { rotate: 360 } : { rotate: 0 }}
+              animate={isGeolocating ? { 
+                rotate: 360,
+                scale: [1, 1.1, 1]
+              } : { rotate: 0 }}
               transition={{ duration: 1, repeat: isGeolocating ? Infinity : 0, ease: 'linear' }}
             >
               <MapPin size={20} />
@@ -260,6 +322,26 @@ export function Header({ onCitySelect, onGeolocate, isGeolocating, selectedCity,
           <LanguageSwitcher />
           <PushNotificationToggle />
           <ThemeToggle />
+          
+          {/* Settings Link */}
+          <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+            <Link
+              href="/settings"
+              className={cn(
+                "flex items-center justify-center w-10 h-10 rounded-xl",
+                "bg-white/10 dark:bg-white/10 light:bg-white/80",
+                "border border-white/20 dark:border-white/20 light:border-slate-200",
+                "text-white dark:text-white light:text-slate-700",
+                "hover:bg-white/20 dark:hover:bg-white/20 light:hover:bg-white/90",
+                "hover:border-white/40 dark:hover:border-white/40 light:hover:border-slate-300",
+                "transition-all duration-200",
+                "shadow-sm"
+              )}
+              title="Paramètres"
+            >
+              <Settings size={20} />
+            </Link>
+          </motion.div>
         </div>
         
         {selectedCity && (

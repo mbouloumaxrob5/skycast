@@ -1,9 +1,9 @@
-"use client";
+'use client';
 
-import { useEffect, useState } from "react";
-import { NextIntlClientProvider } from "next-intl";
-import frMessages from "../../../messages/fr.json";
-import enMessages from "../../../messages/en.json";
+import { useState, useEffect } from 'react';
+import { NextIntlClientProvider } from 'next-intl';
+import frMessages from '../../../messages/fr.json';
+import enMessages from '../../../messages/en.json';
 
 const COOKIE_NAME = 'NEXT_LOCALE';
 
@@ -11,6 +11,8 @@ const messagesMap = {
   fr: frMessages,
   en: enMessages,
 };
+
+type Locale = keyof typeof messagesMap;
 
 function getCookie(name: string): string | null {
   if (typeof document === 'undefined') return null;
@@ -21,20 +23,22 @@ function getCookie(name: string): string | null {
 }
 
 export function I18nProvider({ children }: { children: React.ReactNode }) {
-  const [locale, setLocale] = useState<keyof typeof messagesMap>('fr');
+  // Toujours commencer avec 'fr' pour éviter le mismatch SSR/hydratation
+  const [locale, setLocale] = useState<Locale>('fr');
   const [messages, setMessages] = useState<typeof frMessages>(frMessages);
 
+  // Synchroniser avec le cookie uniquement après montage client
   useEffect(() => {
     const savedLocale = getCookie(COOKIE_NAME);
-    const currentLocale = savedLocale === 'en' ? 'en' : 'fr';
-    
-    if (currentLocale !== locale) {
+    if (savedLocale && savedLocale !== 'fr') {
+      const currentLocale = savedLocale === 'en' ? 'en' : 'fr';
+      // Utiliser requestAnimationFrame pour éviter setState synchrone
       requestAnimationFrame(() => {
         setLocale(currentLocale);
         setMessages(messagesMap[currentLocale]);
       });
     }
-  }, [locale]);
+  }, []);
 
   return (
     <NextIntlClientProvider locale={locale} messages={messages}>

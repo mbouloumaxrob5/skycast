@@ -26,9 +26,9 @@ export function DynamicBackground({ weather, children }: DynamicBackgroundProps)
           }
         : {
             name: 'Default',
-            gradient: 'from-blue-400 via-blue-500 to-blue-600',
-            accent: '#2563EB',
-            text: '#1E3A5F',
+            gradient: 'from-slate-100 via-slate-200 to-slate-300',
+            accent: '#3B82F6',
+            text: '#1E293B',
             icon: 'cloud',
           };
     }

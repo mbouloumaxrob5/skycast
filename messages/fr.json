@@ -49,7 +49,11 @@
     "geolocationUnavailable": "Position non disponible",
     "geolocationTimeout": "Délai de géolocalisation dépassé",
     "weatherFetchError": "Erreur lors de la récupération des données météo",
-    "tryAgain": "Réessayer"
+    "tryAgain": "Réessayer",
+    "notFound": "Page non trouvée",
+    "notFoundDescription": "La page que vous recherchez n'existe pas ou a été déplacée.",
+    "backHome": "Retour à l'accueil",
+    "goBack": "Revenir en arrière"
   },
   "alerts": {
     "title": "Alertes météo",
@@ -109,5 +113,49 @@
   "footer": {
     "copyright": "SkyCast 2025 - Données fournies par OpenWeatherMap",
     "analytics": "Analytics"
+  },
+  "about": {
+    "title": "À propos de SkyCast",
+    "subtitle": "Votre compagnon météo intelligent et moderne",
+    "weather": "Météo en temps réel",
+    "weatherDescription": "Données météorologiques précises et actualisées en temps réel",
+    "location": "Géolocalisation",
+    "locationDescription": "Détection automatique de votre position pour des prévisions locales",
+    "alerts": "Alertes météo",
+    "alertsDescription": "Notifications push pour les alertes météorologiques importantes",
+    "themes": "Thèmes adaptatifs",
+    "themesDescription": "Interface qui s'adapte automatiquement aux conditions météo",
+    "analytics": "Analytics",
+    "analyticsDescription": "Suivi des performances et statistiques d'utilisation",
+    "i18n": "Internationalisation",
+    "i18nDescription": "Support multilingue (Français et Anglais)",
+    "techStack": "Technologies utilisées",
+    "backHome": "Retour à l'accueil",
+    "legal": "Mentions légales",
+    "privacy": "Confidentialité"
+  },
+  "legal": {
+    "title": "Mentions légales",
+    "lastUpdated": "Dernière mise à jour",
+    "section1": "1. Éditeur du site",
+    "section1Content": "SkyCast est une application météo développée à des fins éducatives et démonstratives.",
+    "section2": "2. Hébergement",
+    "section2Content": "L'application est hébergée sur Vercel.",
+    "section3": "3. Propriété intellectuelle",
+    "section3Content": "Tous les droits sont réservés. Les données météorologiques sont fournies par OpenWeatherMap.",
+    "backHome": "Retour à l'accueil"
+  },
+  "privacy": {
+    "title": "Politique de confidentialité",
+    "lastUpdated": "Dernière mise à jour",
+    "section1": "1. Collecte des données",
+    "section1Content": "Nous collectons uniquement les données nécessaires au fonctionnement de l'application : localisation (avec consentement), préférences utilisateur.",
+    "section2": "2. Utilisation des données",
+    "section2Content": "Les données sont utilisées uniquement pour afficher les informations météorologiques et améliorer l'expérience utilisateur.",
+    "section3": "3. Cookies",
+    "section3Content": "Nous utilisons des cookies pour mémoriser vos préférences de langue et de thème.",
+    "section4": "4. Partage des données",
+    "section4Content": "Vos données ne sont pas partagées avec des tiers. Les données météo sont fournies par OpenWeatherMap.",
+    "backHome": "Retour à l'accueil"
   }
 }
